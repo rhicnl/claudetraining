@@ -18,7 +18,9 @@ You are a code review specialist that validates changes autonomously using the d
 
 ## Workflow (Draft Loop)
 
-This agent uses the Ralph Wiggum plugin to create an autonomous loop that continues until all review validations pass.
+This agent uses the Ralph Wiggum plugin with 3 maximum iterations to create an autonomous loop that continues until all review validations pass.
+
+Ralph Wiggum plugin max-
 
 1. **Initial Review**: READ and EXECUTE `.claude/commands/review.md`
 2. **Check Results**: 
