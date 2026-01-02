@@ -1,112 +1,89 @@
-# Troubleshooting Claude CLI Installation Issues
+# Troubleshooting Claude Code CLI Installation Issues
 
-## Multiple Installations Warning
+This page focuses on fixing **Windows** setups where both the **native installer** and the **npm-global** install exist, and Windows is picking the wrong `claude` on your PATH.
 
-If you see a warning about multiple installations of the Claude CLI, you have two installations detected on your system. This can cause confusion about which version is being used.
+## Prefer npm-global on Windows (recommended)
 
-### Symptoms
+The recommended Windows setup is:
+- Install/update via npm: `npm install -g @anthropic-ai/claude-code@latest`
+- Ensure `claude` resolves to your npm global bin (usually `%APPDATA%\npm\claude.cmd`)
 
+## Fix: Remove native install and force npm version
+
+### 1) See every `claude` on your PATH
+
+Run in PowerShell:
+
+```powershell
+# Shows all matches in PATH order (first one is what runs)
+where.exe claude
+
+# Shows all commands PowerShell can resolve
+Get-Command claude -All | Format-Table -AutoSize CommandType, Source
 ```
-Warning: Multiple installations found
-- npm-global at /root/.npm-global/bin/claude
-- native at /root/.local/bin/claude
+
+**You want the first entry** to be under your npm global directory (commonly `C:\Users\<you>\AppData\Roaming\npm\claude.cmd`).
+
+### 2) Remove the native installation
+
+Do these in this order:
+
+1. **Uninstall the native app**:
+   - Windows: **Settings → Apps → Installed apps** (or “Apps & features”)
+   - Uninstall **Claude Code** (or similar name if present)
+
+2. **Delete leftover “native” binaries (if they exist)**:
+
+```powershell
+# Common native-installer location mentioned in Claude Code docs
+Remove-Item -Force "$env:USERPROFILE\.local\bin\claude.exe" -ErrorAction SilentlyContinue
+Remove-Item -Force "$env:USERPROFILE\.local\bin\claude" -ErrorAction SilentlyContinue
 ```
 
-### Solution: Remove Duplicate Installation
+3. **Make sure PATH no longer prefers the native folder**:
+   - If `%USERPROFILE%\.local\bin` is on your PATH, remove it (or ensure `%APPDATA%\npm` comes before it).
+   - Close/reopen your terminal after changing PATH.
 
-Since the `npm-global` installation is currently active and working, remove the native installation:
+### 3) Ensure the npm version is installed (or reinstall it)
 
-1. **Check which installation is currently being used:**
-   ```bash
-   which claude
-   ```
-   This should show `/root/.npm-global/bin/claude`
+```powershell
+npm install -g @anthropic-ai/claude-code@latest
+```
 
-2. **Verify the native installation exists:**
-   ```bash
-   ls -la /root/.local/bin/claude
-   ```
+### 4) Update Claude Code’s install method (if you see mismatch errors)
 
-3. **Remove the native installation:**
-   ```bash
-   rm /root/.local/bin/claude
-   ```
+If you see errors/warnings like **“installMethod is native”** after removing the native install, set it to npm-global:
 
-4. **Update configuration to use npm-global:**
-   If you get an error like "installMethod is native, but claude command not found", you need to update the configuration. Use the npm-global installation directly:
-   ```bash
-   /root/.npm-global/bin/claude config set --global installMethod npm-global
-   ```
-   
-   **Alternative:** If that doesn't work, manually edit the configuration file:
-   ```bash
-   # Check if config file exists
-   ls -la ~/.claude/settings.json
-   
-   # Edit the file and change installMethod to "npm-global"
-   nano ~/.claude/settings.json
-   # Look for "installMethod": "native" and change it to "installMethod": "npm-global"
-   ```
+```powershell
+# Claude Code stores this in a small JSON config file (see below).
+# There isn't a `claude config set -g ...` command in current versions.
+```
 
-5. **Verify the fix:**
-   ```bash
-   claude diagnostics
-   ```
-   The warning should no longer appear, and claude should work correctly.
+#### Manual fix (recommended)
 
-### Alternative: Keep Native Installation
+Edit:
+- `%USERPROFILE%\.config\claude\config.json`
 
-If you prefer to use the native installation instead:
+Set:
 
-1. **Uninstall the npm-global version:**
-   ```bash
-   npm uninstall -g @anthropic-ai/claude
-   ```
+```json
+{
+  "installMethod": "npm-global"
+}
+```
 
-2. **Ensure your PATH prioritizes the native installation:**
-   Check your shell configuration file (`~/.bashrc`, `~/.zshrc`, etc.) and ensure `/root/.local/bin` comes before `/root/.npm-global/bin` in the PATH:
-   ```bash
-   echo $PATH | grep -o '[^:]*' | grep -E '(npm-global|local/bin)'
-   ```
+### 5) Verify
 
-3. **Restart your shell** or reload your configuration:
-   ```bash
-   source ~/.bashrc  # or ~/.zshrc
-   ```
+```powershell
+where.exe claude
+claude --version
 
-### Recommended Setup
+# One of these will exist depending on your CLI version
+claude doctor
+claude diagnostics
+```
 
-For Ubuntu/WSL, the **npm-global** installation method is recommended because:
-- It's easier to update via npm
-- It integrates well with Node.js tooling
-- It's the method shown in the official Claude CLI documentation
+## Prevention checklist
 
-### Error: "installMethod is native, but claude command not found"
-
-If you removed the native installation and get this error, the configuration still references the native method. Fix it by:
-
-1. **Use npm-global claude directly to update config:**
-   ```bash
-   /root/.npm-global/bin/claude config set --global installMethod npm-global
-   ```
-
-2. **Or manually edit the config file:**
-   ```bash
-   # Edit the config file
-   nano ~/.claude/settings.json
-   # Find "installMethod": "native" and change to "installMethod": "npm-global"
-   # Save and exit (Ctrl+X, then Y, then Enter)
-   ```
-
-3. **Verify:**
-   ```bash
-   claude diagnostics
-   ```
-
-### Prevention
-
-To avoid this issue in the future:
-- Use only one installation method (either npm-global or native)
-- If installing via npm, avoid installing the native version
-- Check your PATH variable to ensure only one installation directory is present
-- Before removing an installation, update the config first using: `claude config set --global installMethod <method>`
+- Keep **only one** installation method active (prefer **npm-global** on Windows).
+- Use `where.exe claude` after installs/updates to confirm you’re running the expected binary.

@@ -36,3 +36,9 @@ temp/
 
 # MCP Configuration (keep .mcp.json.sample in git, exclude .mcp.json to prevent committing secrets)
 .mcp.json
+
+# Testing
+coverage/
+.playwright/
+test-results/
+playwright-report/

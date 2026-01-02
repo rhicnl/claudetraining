@@ -77,7 +77,6 @@ This project uses the following MCP servers:
 - **Firecrawl** (`firecrawl-mcp`) - Advanced web scraping and crawling
 - **Supabase** (OAuth) - Supabase platform integration and management
 - **PostgreSQL** (`@modelcontextprotocol/server-postgres`) - Direct database access for queries and operations
-- **Desktop Commander** (`@modelcontextprotocol/server-desktop-commander`) - Desktop automation and system commands
 - **Toolbox** (`@modelcontextprotocol/server-toolbox`) - Collection of development utility tools
 
 ### Usage
