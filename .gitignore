@@ -9,6 +9,7 @@
 # Logs
 *.log
 logs/
+pnpm-debug.log*
 
 # Environment variables
 .env
@@ -17,6 +18,10 @@ logs/
 
 # Dependencies
 node_modules/
+
+# Prevent npm/yarn lock files from being committed (project uses pnpm)
+package-lock.json
+yarn.lock
 __pycache__/
 *.pyc
 .python-version

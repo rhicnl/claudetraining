@@ -31,10 +31,10 @@ This is a fresh repository without established build, test, or lint commands. Wh
 
 
 ## Commands
-- `npm run dev` - Start development server
-- `npm run test` - Run test suite
-- `npm run lint` - Run ESLint linter
-- `npm run type-check` - Run TypeScript type checking
+- `pnpm run dev` - Start development server
+- `pnpm run test` - Run test suite
+- `pnpm run lint` - Run ESLint linter
+- `pnpm run type-check` - Run TypeScript type checking
 
 ## MCP Server Configuration
 
